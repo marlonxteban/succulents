@@ -20,10 +20,7 @@ class SucculentsApiTests(unittest.TestCase):
         self.db = db
         setup_db(self.app)
         with self.app.app_context():
-            #self.db = db
-            #self.db.init_app(self.app)
             self.db.create_all()
-            #import pdb; pdb.set_trace()
             self.populatedb(self.db)
 
     def tearDown(self):
@@ -69,13 +66,31 @@ class SucculentsApiTests(unittest.TestCase):
             db.session.rollback()
             print(sys.exc_info())
 
+    """
+    Families endpoints tests
+    """
+
     def test_get_families(self):
         response = self.client().get("/families")
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["total"], 3)
         self.assertTrue(lambda x: x["name"] ==
-                        "cactus" in data["families"])
+                        "burrito1" in data["families"])
+        print(list(data["families"]))
+
+    """
+    Succulents endpoints tests
+    """
+
+    def test_get_succulents(self):
+        response = self.client().get("/succulents")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["total"], 5)
+        self.assertTrue(lambda x: x["name"] ==
+                        "cactus" in data["succulents"])
+        print(list(data["succulents"]))
 
 
 if __name__ == "__main__":
