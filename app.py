@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, abort
 from database.model import setup_db, Family, Succulent
+from errors.processError import ProcessError
 from flask_cors import CORS
 from config import config
 import json
@@ -23,6 +24,7 @@ def create_app():
         response.headers.add('Access-Control-Allow-Methods',
                              'GET,PUT,POST,PATCH,DELETE,OPTIONS')
         return response
+
     """
     Families endpoints
     """
@@ -36,6 +38,35 @@ def create_app():
             "success": True,
             "families": [family.format() for family in families]
         })
+
+    @app.route('/families/<int:id>', methods=["DELETE"])
+    def delete_family(id):
+
+        family = Family.query.filter(Family.id == id).one_or_none()
+
+        if not family:
+            abort(404)
+
+        if len(family.succulents):
+            raise ProcessError({
+                'code': 'related_succulents',
+                'description':
+                'There are succulents asociated with the family.'
+            }, 422)
+
+        try:
+            family.delete()
+            remaining_families = Family.query.count()
+            remaining_succulents = Succulent.query.count()
+
+            return jsonify({
+                "success": True,
+                "deleted": id,
+                "remaining_families": remaining_families,
+                "remaining_succulents": remaining_succulents
+            })
+        except Exception:
+            abort(422)
 
     """
     Succulents endpoints
@@ -55,6 +86,14 @@ def create_app():
     '''
     Error handlers.
     '''
+    @app.errorhandler(ProcessError)
+    def process_error(error):
+        return jsonify({
+            "success": False,
+            "error": error.status_code,
+            "message": error.error["description"]
+        }), error.status_code
+
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({

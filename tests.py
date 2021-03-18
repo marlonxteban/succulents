@@ -48,6 +48,9 @@ class SucculentsApiTests(unittest.TestCase):
                          weather="various",
                          diferentiator="stores water until rainfall resumes")
         succulent5 = Succulent(name="zz", family_id=3, life_time=1)
+        family4 = Family(name="test one", environment="test",
+                         weather="all",
+                         diferentiator="this family will die")
 
         succulents1 = [succulent1, succulent2]
         succulents2 = [succulent3, succulent4]
@@ -61,6 +64,7 @@ class SucculentsApiTests(unittest.TestCase):
             db.session.add(family1)
             db.session.add(family2)
             db.session.add(family3)
+            db.session.add(family4)
             db.session.commit()
         except Exception:
             db.session.rollback()
@@ -74,10 +78,33 @@ class SucculentsApiTests(unittest.TestCase):
         response = self.client().get("/families")
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data["total"], 3)
+        self.assertEqual(data["total"], 4)
         self.assertTrue(lambda x: x["name"] ==
                         "burrito1" in data["families"])
         print(list(data["families"]))
+
+    def test_422_delete_family_with_succulents(self):
+        error_message = "There are succulents asociated with the family."
+        response = self.client().delete("/families/1")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 422)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
+    def test_404_delete_not_existing_family(self):
+        error_message = "resource not found"
+        response = self.client().delete("/families/1000")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
+    def test_delete_family(self):
+        response = self.client().delete("/families/4")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["remaining_families"], 3)
+        self.assertEqual(data["remaining_succulents"], 5)
 
     """
     Succulents endpoints tests
