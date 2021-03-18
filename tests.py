@@ -81,7 +81,7 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertEqual(data["total"], 4)
         self.assertTrue(lambda x: x["name"] ==
                         "burrito1" in data["families"])
-        print(list(data["families"]))
+        # print(list(data["families"]))
 
     def test_422_delete_family_with_succulents(self):
         error_message = "There are succulents asociated with the family."
@@ -103,6 +103,7 @@ class SucculentsApiTests(unittest.TestCase):
         response = self.client().delete("/families/4")
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["deleted"], 4)
         self.assertEqual(data["remaining_families"], 3)
         self.assertEqual(data["remaining_succulents"], 5)
 
@@ -117,7 +118,22 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertEqual(data["total"], 5)
         self.assertTrue(lambda x: x["name"] ==
                         "cactus" in data["succulents"])
-        print(list(data["succulents"]))
+        # print(list(data["succulents"]))
+
+    def test_404_delete_not_existing_succulent(self):
+        error_message = "resource not found"
+        response = self.client().delete("/succulents/1000")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
+    def test_delete_succulent(self):
+        response = self.client().delete("/succulents/5")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["deleted"], 5)
+        self.assertEqual(data["remaining_succulents"], 4)
 
 
 if __name__ == "__main__":

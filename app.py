@@ -83,6 +83,26 @@ def create_app():
                            for succulent in succulents]
         })
 
+    @app.route('/succulents/<int:id>', methods=["DELETE"])
+    def delete_succulent(id):
+
+        succulent = Succulent.query.filter(Succulent.id == id).one_or_none()
+
+        if not succulent:
+            abort(404)
+
+        try:
+            succulent.delete()
+            remaining_succulents = Succulent.query.count()
+
+            return jsonify({
+                "success": True,
+                "deleted": id,
+                "remaining_succulents": remaining_succulents
+            })
+        except Exception:
+            abort(422)
+
     '''
     Error handlers.
     '''
