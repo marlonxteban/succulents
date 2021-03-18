@@ -107,6 +107,53 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertEqual(data["remaining_families"], 3)
         self.assertEqual(data["remaining_succulents"], 5)
 
+    def test_create_family(self):
+        new_family = {
+            "name": "super family",
+            "environment": "wet",
+            "weather": "rainy",
+            "differentiator": "super plants"
+        }
+
+        response = self.client().post("/families", json=new_family)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+        self.assertTrue(data["total_families"])
+        self.assertEqual(data["created"], 5)
+
+    def test_create_family(self):
+        new_family = {
+            "name": "super family",
+            "environment": "wet",
+            "weather": "rainy",
+            "differentiator": "super plants"
+        }
+
+        response = self.client().post("/families", json=new_family)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+        self.assertTrue(data["total_families"])
+        self.assertEqual(data["created"], 5)
+
+    def test_400_missing_differentiator(self):
+        error_message = "name and differentiator are required."
+        new_family = {
+            "name": "super family 2",
+            "environment": "wet",
+            "weather": "rainy",
+        }
+
+        response = self.client().post("/families", json=new_family)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
     """
     Succulents endpoints tests
     """

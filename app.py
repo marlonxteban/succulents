@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, abort
 from database.model import setup_db, Family, Succulent
 from errors.processError import ProcessError
 from flask_cors import CORS
+from helpers import familyHelper
 from config import config
 import json
 
@@ -64,6 +65,42 @@ def create_app():
                 "deleted": id,
                 "remaining_families": remaining_families,
                 "remaining_succulents": remaining_succulents
+            })
+        except Exception:
+            abort(422)
+
+    @app.route("/families", methods=["POST"])
+    def create_family():
+        body = request.get_json()
+        # import pdb; pdb.set_trace()
+
+        if not familyHelper.is_valid_family(body):
+            raise ProcessError({
+                'code': 'invalid_family',
+                'description':
+                'name and differentiator are required.'
+            }, 400)
+
+        name = body.get("name")
+        environment = body.get("environment")
+        weather = body.get("weather")
+        differentiator = body.get("differentiator")
+
+        try:
+            last_family = Family.query.order_by(Family.id.desc()).first()
+            new_family = Family(name=name,
+                                environment=environment,
+                                weather=weather,
+                                diferentiator=differentiator)
+            new_family.id = last_family.id + 1
+            new_family.insert()
+            total_families = Family.query.count()
+
+            return jsonify({
+                "status_code": 200,
+                "success": True,
+                "created": new_family.id,
+                "total_families": total_families
             })
         except Exception:
             abort(422)
