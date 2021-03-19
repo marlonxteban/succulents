@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, abort
 from database.model import setup_db, Family, Succulent
 from errors.processError import ProcessError
 from flask_cors import CORS
-from helpers import familyHelper
+from helpers import familyHelper, succulentHelper
 from config import config
 import json
 
@@ -42,7 +42,6 @@ def create_app():
 
     @app.route('/families/<int:id>', methods=["DELETE"])
     def delete_family(id):
-
         family = Family.query.filter(Family.id == id).one_or_none()
 
         if not family:
@@ -72,7 +71,6 @@ def create_app():
     @app.route("/families", methods=["POST"])
     def create_family():
         body = request.get_json()
-        # import pdb; pdb.set_trace()
 
         if not familyHelper.is_valid_family(body):
             raise ProcessError({
@@ -105,6 +103,34 @@ def create_app():
         except Exception:
             abort(422)
 
+    @app.route('/families/<int:id>', methods=["PATCH"])
+    def update_family(id):
+        family = Family.query.filter(Family.id == id).one_or_none()
+
+        if not family:
+            abort(404)
+
+        name = body.get("name")
+        environment = body.get("environment")
+        weather = body.get("weather")
+        differentiator = body.get("differentiator")
+
+        if name:
+            family.name = name
+        if environment:
+            family.environment = environment
+        if weather:
+            family.weather = weather
+        if differentiator:
+            family.differentiator = differentiator
+
+        family.update()
+
+        return jsonify({
+            "success": True,
+            "updated": family.format()
+        })
+
     """
     Succulents endpoints
     """
@@ -136,6 +162,41 @@ def create_app():
                 "success": True,
                 "deleted": id,
                 "remaining_succulents": remaining_succulents
+            })
+        except Exception:
+            abort(422)
+
+    @app.route("/succulents", methods=["POST"])
+    def create_succulent():
+        body = request.get_json()
+        # import pdb; pdb.set_trace()
+
+        if not succulentHelper.is_valid_succulent(body):
+            raise ProcessError({
+                'code': 'invalid_succulent',
+                'description':
+                'name and family_id are required.'
+            }, 400)
+
+        name = body.get("name")
+        family_id = body.get("family_id")
+        life_time = body.get("life_time")
+
+        try:
+            last_succulent = (Succulent.query.order_by(Succulent.id.desc())
+                              .first())
+            new_succulent = Succulent(name=name,
+                                      family_id=family_id,
+                                      life_time=life_time)
+            new_succulent.id = last_succulent.id + 1
+            new_succulent.insert()
+            total_succulents = Succulent.query.count()
+
+            return jsonify({
+                "status_code": 200,
+                "success": True,
+                "created": new_succulent.id,
+                "total_succulents": total_succulents
             })
         except Exception:
             abort(422)
