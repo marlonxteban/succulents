@@ -165,6 +165,25 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["updated"]["name"], updated_name)
 
+    def test_404_get_succulents_by_family(self):
+        response = self.client().get("/families/1000/succulents")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(data["success"])
+
+    def test_get_succulents_by_family(self):
+        family_id = 2
+        response = self.client().get(f"/families/{family_id}/succulents")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+        self.assertEqual(data["family_id"], family_id)
+        self.assertEqual(data["total_succulents"], 2)
+        self.assertTrue(lambda x: x["name"] ==
+                        "burrote2" in data["succulents"])
+        self.assertTrue(lambda x: x["name"] ==
+                        "burrito1" in data["succulents"])
+
     """
     Succulents endpoints tests
     """

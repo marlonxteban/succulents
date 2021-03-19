@@ -129,8 +129,25 @@ def create_app():
         family.update()
 
         return jsonify({
+            "status_code": 200,
             "success": True,
             "updated": family.format()
+        })
+
+    @app.route('/families/<int:id>/succulents')
+    def get_succulents_bt_family(id):
+        family = Family.query.filter(Family.id == id).one_or_none()
+
+        if not family:
+            abort(404)
+
+        return jsonify({
+            "status_code": 200,
+            "success": True,
+            "family_id": family.id,
+            "succulents": [succulent.format()
+                           for succulent in family.succulents],
+            "total_succulents": len(family.succulents)
         })
 
     """
@@ -171,7 +188,6 @@ def create_app():
     @app.route("/succulents", methods=["POST"])
     def create_succulent():
         body = request.get_json()
-        # import pdb; pdb.set_trace()
 
         if not succulentHelper.is_valid_succulent(body):
             raise ProcessError({
@@ -205,7 +221,6 @@ def create_app():
 
     @app.route('/succulents/<int:id>', methods=["PATCH"])
     def update_succulent(id):
-        # import pdb; pdb.set_trace()
         succulent = Succulent.query.filter(Succulent.id == id).one_or_none()
 
         if not succulent:
@@ -226,6 +241,7 @@ def create_app():
         succulent.update()
 
         return jsonify({
+            "status_code": 200,
             "success": True,
             "updated": succulent.format()
         })
