@@ -203,6 +203,33 @@ def create_app():
         except Exception:
             abort(422)
 
+    @app.route('/succulents/<int:id>', methods=["PATCH"])
+    def update_succulent(id):
+        # import pdb; pdb.set_trace()
+        succulent = Succulent.query.filter(Succulent.id == id).one_or_none()
+
+        if not succulent:
+            abort(404)
+
+        body = request.get_json()
+        name = body.get("name")
+        family_id = body.get("family_id")
+        life_time = body.get("life_time")
+
+        if name:
+            succulent.name = name
+        if family_id:
+            succulent.family_id = family_id
+        if life_time:
+            succulent.life_time = life_time
+
+        succulent.update()
+
+        return jsonify({
+            "success": True,
+            "updated": succulent.format()
+        })
+
     '''
     Error handlers.
     '''

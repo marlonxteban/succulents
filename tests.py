@@ -222,6 +222,32 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertFalse(data["success"])
         self.assertEqual(error_message, data["message"])
 
+    def test_404_update_non_existing_succulent(self):
+        new_succulent = {
+            "name": "super succulent"
+        }
+
+        response = self.client().patch("/succulents/100", json=new_succulent)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(data["success"])
+
+    def test_update_succulent(self):
+        updated_name = "super updated succulent"
+        updated_succulent = {
+            "name": updated_name,
+            "life_time": 9
+        }
+
+        response = self.client().patch("/succulents/5",
+                                       json=updated_succulent)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["updated"]["name"], updated_name)
+        self.assertEqual(data["updated"]["life_time"], 9)
+
 
 if __name__ == "__main__":
     unittest.main()
