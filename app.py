@@ -105,11 +105,13 @@ def create_app():
 
     @app.route('/families/<int:id>', methods=["PATCH"])
     def update_family(id):
+        # import pdb; pdb.set_trace()
         family = Family.query.filter(Family.id == id).one_or_none()
 
         if not family:
             abort(404)
 
+        body = request.get_json()
         name = body.get("name")
         environment = body.get("environment")
         weather = body.get("weather")

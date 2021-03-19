@@ -138,6 +138,33 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertFalse(data["success"])
         self.assertEqual(error_message, data["message"])
 
+    def test_404_update_non_existing_family(self):
+        new_family = {
+            "name": "super family",
+            "environment": "wet",
+            "weather": "rainy",
+            "differentiator": "super plants"
+        }
+
+        response = self.client().patch("/families/100", json=new_family)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(data["success"])
+
+    def test_update_family(self):
+        updated_name = "super updated family"
+        updated_family = {
+            "name": updated_name,
+            "differentiator": "super updated plants"
+        }
+
+        response = self.client().patch("/families/4", json=updated_family)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["updated"]["name"], updated_name)
+
     """
     Succulents endpoints tests
     """
