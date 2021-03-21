@@ -71,7 +71,8 @@ def create_app():
             abort(422)
 
     @app.route("/families", methods=["POST"])
-    def create_family():
+    @requires_auth('post:family')
+    def create_family(payload):
         body = request.get_json()
 
         if not familyHelper.is_valid_family(body):
@@ -106,8 +107,8 @@ def create_app():
             abort(422)
 
     @app.route('/families/<int:id>', methods=["PATCH"])
-    def update_family(id):
-        # import pdb; pdb.set_trace()
+    @requires_auth('patch:family')
+    def update_family(payload, id):
         family = Family.query.filter(Family.id == id).one_or_none()
 
         if not family:
@@ -167,8 +168,23 @@ def create_app():
                            for succulent in succulents]
         })
 
+    @app.route('/succulents/<int:id>')
+    @requires_auth('get:succulent-detail')
+    def get_succulent(payload, id):
+        succulent = Succulent.query.filter(Succulent.id == id).one_or_none()
+
+        if not succulent:
+            abort(404)
+
+        return jsonify({
+            "status_code": 200,
+            "success": True,
+            "succulent": succulent.format()
+        })
+
     @app.route('/succulents/<int:id>', methods=["DELETE"])
-    def delete_succulent(id):
+    @requires_auth('delete:succulent')
+    def delete_succulent(payload, id):
 
         succulent = Succulent.query.filter(Succulent.id == id).one_or_none()
 
@@ -188,7 +204,8 @@ def create_app():
             abort(422)
 
     @app.route("/succulents", methods=["POST"])
-    def create_succulent():
+    @requires_auth('post:succulent')
+    def create_succulent(payload):
         body = request.get_json()
 
         if not succulentHelper.is_valid_succulent(body):
@@ -222,7 +239,8 @@ def create_app():
             abort(422)
 
     @app.route('/succulents/<int:id>', methods=["PATCH"])
-    def update_succulent(id):
+    @requires_auth('patch:succulent')
+    def update_succulent(payload, id):
         succulent = Succulent.query.filter(Succulent.id == id).one_or_none()
 
         if not succulent:
@@ -282,6 +300,14 @@ def create_app():
             "error": 400,
             "message": "bad request"
         }), 400
+
+    @app.errorhandler(AuthError)
+    def auth_error(error):
+        return jsonify({
+            "success": False,
+            "error": error.status_code,
+            "message": error.error["description"]
+        }), error.status_code
 
     return app
 

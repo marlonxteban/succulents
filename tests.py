@@ -122,8 +122,10 @@ class SucculentsApiTests(unittest.TestCase):
             "weather": "rainy",
             "differentiator": "super plants"
         }
-
-        response = self.client().post("/families", json=new_family)
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().post("/families",
+                                      headers=header,
+                                      json=new_family)
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
@@ -138,8 +140,10 @@ class SucculentsApiTests(unittest.TestCase):
             "environment": "wet",
             "weather": "rainy",
         }
-
-        response = self.client().post("/families", json=new_family)
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().post("/families",
+                                      headers=header,
+                                      json=new_family)
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 400)
@@ -153,8 +157,10 @@ class SucculentsApiTests(unittest.TestCase):
             "weather": "rainy",
             "differentiator": "super plants"
         }
-
-        response = self.client().patch("/families/100", json=new_family)
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().patch("/families/100",
+                                       headers=header,
+                                       json=new_family)
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 404)
@@ -166,8 +172,10 @@ class SucculentsApiTests(unittest.TestCase):
             "name": updated_name,
             "differentiator": "super updated plants"
         }
-
-        response = self.client().patch("/families/4", json=updated_family)
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().patch("/families/4",
+                                       headers=header,
+                                       json=updated_family)
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
@@ -205,16 +213,36 @@ class SucculentsApiTests(unittest.TestCase):
                         "cactus" in data["succulents"])
         # print(list(data["succulents"]))
 
+    def test_get_succulent_detail(self):
+        header = self.get_bearer_header(self.collaborator_token)
+        expected_name = "burrito1"
+        response = self.client().get("/succulents/3", headers=header)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+        self.assertEqual(data["succulent"]["name"], expected_name)
+
+    def test_404_not_existing_succulent_detail(self):
+        error_message = "resource not found"
+        header = self.get_bearer_header(self.collaborator_token)
+        response = self.client().get("/succulents/3000", headers=header)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
     def test_404_delete_not_existing_succulent(self):
         error_message = "resource not found"
-        response = self.client().delete("/succulents/1000")
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().delete("/succulents/1000", headers=header)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 404)
         self.assertFalse(data["success"])
         self.assertEqual(error_message, data["message"])
 
     def test_delete_succulent(self):
-        response = self.client().delete("/succulents/5")
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().delete("/succulents/5", headers=header)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["deleted"], 5)
@@ -226,8 +254,10 @@ class SucculentsApiTests(unittest.TestCase):
             "family_id": 2,
             "life_time": 3,
         }
-
-        response = self.client().post("/succulents", json=new_succulent)
+        header = self.get_bearer_header(self.collaborator_token)
+        response = self.client().post("/succulents",
+                                      headers=header,
+                                      json=new_succulent)
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
@@ -241,8 +271,10 @@ class SucculentsApiTests(unittest.TestCase):
             "family_id": 2,
             "life_time": 3,
         }
-
-        response = self.client().post("/succulents", json=new_family)
+        header = self.get_bearer_header(self.collaborator_token)
+        response = self.client().post("/succulents",
+                                      headers=header,
+                                      json=new_family)
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 400)
@@ -253,8 +285,10 @@ class SucculentsApiTests(unittest.TestCase):
         new_succulent = {
             "name": "super succulent"
         }
-
-        response = self.client().patch("/succulents/100", json=new_succulent)
+        header = self.get_bearer_header(self.collaborator_token)
+        response = self.client().patch("/succulents/100",
+                                       headers=header,
+                                       json=new_succulent)
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 404)
@@ -266,8 +300,9 @@ class SucculentsApiTests(unittest.TestCase):
             "name": updated_name,
             "life_time": 9
         }
-
+        header = self.get_bearer_header(self.collaborator_token)
         response = self.client().patch("/succulents/5",
+                                       headers=header,
                                        json=updated_succulent)
         data = json.loads(response.data)
 
