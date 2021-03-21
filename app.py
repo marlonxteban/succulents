@@ -4,6 +4,7 @@ from errors.processError import ProcessError
 from flask_cors import CORS
 from helpers import familyHelper, succulentHelper
 from config import config
+from auth.auth import AuthError, requires_auth
 import json
 
 
@@ -41,7 +42,8 @@ def create_app():
         })
 
     @app.route('/families/<int:id>', methods=["DELETE"])
-    def delete_family(id):
+    @requires_auth('delete:family')
+    def delete_family(payload, id):
         family = Family.query.filter(Family.id == id).one_or_none()
 
         if not family:

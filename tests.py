@@ -13,6 +13,8 @@ class SucculentsApiTests(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
         self.client = self.app.test_client
+        self.owner_token = os.getenv('OWNER_TOKEN')
+        self.collaborator_token = os.getenv('COLLABORATOR_TOKEN')
         self.database_name = "succulents_test"
         self.database_path = "postgres://{}@{}/{}".format(
             'postgres:admin', 'localhost:5432', self.database_name)
@@ -28,6 +30,9 @@ class SucculentsApiTests(unittest.TestCase):
             # drop tables
             Succulent.__table__.drop(self.db.engine)
             Family.__table__.drop(self.db.engine)
+
+    def get_bearer_header(self, token):
+        return {'Authorization': f"Bearer {token}"}
 
     """
     Populate database with example data
@@ -84,23 +89,26 @@ class SucculentsApiTests(unittest.TestCase):
         # print(list(data["families"]))
 
     def test_422_delete_family_with_succulents(self):
+        header = self.get_bearer_header(self.owner_token)
         error_message = "There are succulents asociated with the family."
-        response = self.client().delete("/families/1")
+        response = self.client().delete("/families/1", headers=header)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 422)
         self.assertFalse(data["success"])
         self.assertEqual(error_message, data["message"])
 
     def test_404_delete_not_existing_family(self):
+        header = self.get_bearer_header(self.owner_token)
         error_message = "resource not found"
-        response = self.client().delete("/families/1000")
+        response = self.client().delete("/families/1000", headers=header)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 404)
         self.assertFalse(data["success"])
         self.assertEqual(error_message, data["message"])
 
     def test_delete_family(self):
-        response = self.client().delete("/families/4")
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().delete("/families/4", headers=header)
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["deleted"], 4)
