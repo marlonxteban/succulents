@@ -310,6 +310,73 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertEqual(data["updated"]["name"], updated_name)
         self.assertEqual(data["updated"]["life_time"], 9)
 
+    """
+    RBAC tests role: collaborator
+    """
+
+    def test_collabotator_can_not_delete_succulent(self):
+        error_message = "Permission not found."
+        header = self.get_bearer_header(self.collaborator_token)
+        response = self.client().delete("/succulents/1000", headers=header)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
+    def test_collaborator_can_not_create_family(self):
+        error_message = "Permission not found."
+        new_family = {
+            "name": "super family",
+            "environment": "wet",
+            "weather": "rainy",
+            "differentiator": "super plants"
+        }
+        header = self.get_bearer_header(self.collaborator_token)
+        response = self.client().post("/families",
+                                      headers=header,
+                                      json=new_family)
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
+    """
+    RBAC tests role: owner
+    """
+
+    def test_owner_can_update_succulent(self):
+        updated_name = "super updated succulent"
+        updated_succulent = {
+            "name": updated_name,
+            "life_time": 9
+        }
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().patch("/succulents/5",
+                                       headers=header,
+                                       json=updated_succulent)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data["updated"]["name"], updated_name)
+        self.assertEqual(data["updated"]["life_time"], 9)
+
+    def test_owner_can_create_succulent(self):
+        new_succulent = {
+            "name": "super succulent",
+            "family_id": 2,
+            "life_time": 3,
+        }
+        header = self.get_bearer_header(self.owner_token)
+        response = self.client().post("/succulents",
+                                      headers=header,
+                                      json=new_succulent)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+        self.assertTrue(data["total_succulents"], 6)
+        self.assertEqual(data["created"], 6)
+
 
 if __name__ == "__main__":
     unittest.main()
