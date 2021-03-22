@@ -8,5 +8,5 @@ load_dotenv(dotenv_path)
 SECRET_KEY = os.urandom(32)
 # Enable debug mode.
 DEBUG = True
-SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
