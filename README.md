@@ -1,2 +1,276 @@
 # succulents
-application that shows you succulents, their characteristics and where to get them. 
+application that shows you succulents, their characteristics and where to get them.
+Note: Actually this app is a prototype developed for the capstone project of Full Stack Web Developer nanodegree by Udacity.
+
+## Database Setup
+This project uses a postgres database engine.
+In the root folder there is a file named `succulents.psql`.
+- Run:
+```bash
+psql succulents < succulents.psql
+```
+
+- Create a database called
+``` bash
+succulents_test
+```
+for the unit tests.
+
+## Api Setup
+1. Install the packages.
+``` bash
+pip install -r requirements.txt
+```
+2. In folder `config` create a file named `.env` and populate with the next following code:
+``` bash
+DATABASE_URL = 'postgresql://postgres:admin@localhost:5432/succulents'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+OWNER_TOKEN = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjlQQ3drelZ1LUItSl9qckdJVXJCciJ9.eyJpc3MiOiJodHRwczovL21hcmxvbnh0ZWJhbi51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjAxOGJlZWVhMDgzN2EwMDY5ZjkwZDYyIiwiYXVkIjoic3VjY3VsZW50cyIsImlhdCI6MTYxNjkxODI0MiwiZXhwIjoxNjE3MDA0NjQyLCJhenAiOiJZZG84NFpJc1RwSm5LMWg2eWk3dkp5ZlRoVXE3NlNYVyIsInNjb3BlIjoiIiwicGVybWlzc2lvbnMiOlsiZGVsZXRlOmZhbWlseSIsImRlbGV0ZTpzdWNjdWxlbnQiLCJnZXQ6c3VjY3VsZW50LWRldGFpbCIsInBhdGNoOmZhbWlseSIsInBhdGNoOnN1Y2N1bGVudCIsInBvc3Q6ZmFtaWx5IiwicG9zdDpzdWNjdWxlbnQiXX0.FfwpzS3YWfF8Bukmh8ZC3rIneyATv6TUtUirpe4Z_Z-FJkF_yzEbl4gsHhXJIcU-TowfgiRCizFuFL-yua_CMTlYxTR-NhXNePMwPh7kJqQla82MeXIwF_SpgFLVFphxGsbXQ75imrQSJWmoSlMuoz_0Z52Jp3WTx2dlrB9pKdWTv8IAApDaxfulG2SHHghbadAkacjAXB_6wgEWnNj6k4cKQhqLHFyB7s6HQno-_lPk3JhypLBsmuUb0e03RLhOhJ7Ux81VHwMNOjU0cZwofaWjzHUK7PSVQsepOThttsX4BPtslaNbVS1ak4aggL0fEy8UewEGgR7O8MZfO51azA
+COLLABORATOR_TOKEN = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjlQQ3drelZ1LUItSl9qckdJVXJCciJ9.eyJpc3MiOiJodHRwczovL21hcmxvbnh0ZWJhbi51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjAxOGMwYThhMDgzN2EwMDY5ZjkwZDgxIiwiYXVkIjoic3VjY3VsZW50cyIsImlhdCI6MTYxNjkxODM0NiwiZXhwIjoxNjE3MDA0NzQ2LCJhenAiOiJZZG84NFpJc1RwSm5LMWg2eWk3dkp5ZlRoVXE3NlNYVyIsInNjb3BlIjoiIiwicGVybWlzc2lvbnMiOlsiZ2V0OnN1Y2N1bGVudC1kZXRhaWwiLCJwYXRjaDpzdWNjdWxlbnQiLCJwb3N0OnN1Y2N1bGVudCJdfQ.FxTRvep85DZfmdo3rSURqcih22CP8ZNIjJPBBi5O10oaVy_xGL1Fn2u4ixEuH21yN_t3_OhPLDoNJxQ56LaP3Zs1XZC_Bcce2_dl7NSQlHiDebqQJqEHKnDXl88hwywSOGE-IvCby2cwAdHCcNEHfSvxON5UiOL2rP8h773TfscJ6tz1VV8swDQQzB9RfzoWvZfKXKeKw_OOoegEnpC9iuaZVUFOghEvrg9cuNuVBfgv_2jPspM2qhynboLNt0-q6qhSUSvdTQB2RMVrRK9CyWNV6R1dUafkpXIjWiXgByZUGtelOQNA3jJZ1MBI63URJqe3-_6KUmxTreTxB6lQOQ
+```
+These values are used for local environment so you can change according to your system. token values are actual functional tokens used for run tests.
+
+3. Run tests
+``` bash
+python tests.py
+```
+All tests should run ok. This test file have several tests for each endpoint an RBAC tests. there are no tests in a postman collection because the access control is tested using unit tests.
+
+4. Run
+``` bash
+python app.py
+```
+Now the API is up.
+
+5. The front end for this API is in the repo [succulentsclient](https://github.com/marlonxteban/succulentsclient), the instructions of how to set up the front end are in te readme of the repo.
+
+6. This API is live in [mysucculents](https://mysucculents.herokuapp.com/), the front end to use the API is live in [succulentsclient](https://succulentsclient.herokuapp.com/).
+
+# Endpoints
+
+## GET '/families'
+
+- Fetches an array of families of succulents
+- Auth: not required
+- Request Arguments: None
+- Returns: An object that has the list of families.
+### response example
+```json
+    {
+      "status_code": 200,
+      "total": 1,
+      "success": "True",
+      "families": [
+        {
+        "differentiator": "test 1", 
+        "environment": "dry", 
+        "id": 1, 
+        "name": "test family 1", 
+        "weather": "sunny"
+        }
+      ]
+    }
+```
+## GET '/families/<int:id>'
+- Fetches a family specified by the id.
+- Auth: not required
+- Request Arguments: `id` integer.
+- Returns: An object that contains: `status_code`, `success`, `family`.
+
+### response example
+```json
+{
+  "family": {
+    "differentiator": "test 1", 
+    "environment": "dry", 
+    "id": 1, 
+    "name": "test family 1", 
+    "weather": "sunny"
+  }, 
+  "status_code": 200, 
+  "success": true
+}
+```
+
+## DELETE '/families/<int:id>'
+- Delete a family using id
+- Auth: owner
+- Request Arguments: `id` integer.
+- Returns: An object that contains: `deleted`, `success`, `remaining_families`, `remaining_succulents` (after delete).
+### response example
+```json
+{
+  "deleted": 2, 
+  "remaining_families": 1, 
+  "remaining_succulents": 1, 
+  "success": true
+}
+```
+
+## POST '/families'
+- Create new family
+- Auth: owner
+- Request Arguments: `name`: string, `environment`: string, `weather`: string, `differentiator`: string.
+- Returns: An object that contains: `status_code`, `success`, `total_families`, `created` (id of new family).
+### request body example
+```json
+{
+  "name": "test family 2",
+  "environment": "hot",
+  "weather": "rainy",
+  "differentiator": "test 2"
+}
+```
+### response example
+```json
+{
+  "created": 2, 
+  "status_code": 200, 
+  "success": true, 
+  "total_families": 2
+}
+```
+
+## PATCH '/families/<int:id>'
+- Update a family by id
+- Auth: owner
+- Request Arguments: `id`: integer,`name`: string, `environment`: string, `weather`: string, `differentiator`: string.
+- Returns: An object that contains: `status_code`, `success`, `updated`.
+### request body example
+```json
+{
+  "differentiator": "test 1",
+  "environment": "dry",
+  "id": 1,
+  "name": "test family 1 updated",
+  "weather": "sunny"
+}
+```
+### response example
+```json
+{
+  "status_code": 200, 
+  "success": true, 
+  "updated": {
+    "differentiator": "test 1", 
+    "environment": "dry", 
+    "id": 1, 
+    "name": "test family 1 updated", 
+    "weather": "sunny"
+  }
+}
+```
+
+
+## GET '/succulents'
+
+- Fetches an array of succulents
+- Auth: not required
+- Request Arguments: None
+- Returns: An object that has the list of succulents.
+### response example
+```json
+    {
+  "status_code": 200, 
+  "success": true, 
+  "succulents": [
+    {
+      "family_id": 1, 
+      "id": 1, 
+      "life_time": 5, 
+      "name": "test succulent 1"
+    }, 
+    {
+      "family_id": 1, 
+      "id": 2, 
+      "life_time": 2, 
+      "name": "succulent 2"
+    }
+  ], 
+  "total": 2
+}
+```
+## GET '/succulents/<int:id>'
+- Fetches a succulent specified by the id.
+- Auth: collaborator at least
+- Request Arguments: `id` integer.
+- Returns: An object that contains: `status_code`, `success`, `succulent`.
+
+### response example
+```json
+{
+  "status_code": 200, 
+  "success": true, 
+  "succulent": {
+    "family_id": 1, 
+    "id": 1, 
+    "life_time": 5, 
+    "name": "test succulent 1"
+  }
+}
+```
+
+## DELETE '/succulents/<int:id>'
+- Delete a succulents using id
+- Auth: collaborator at least
+- Request Arguments: `id` integer.
+- Returns: An object that contains: `deleted`, `success`, `remaining_succulents` (after delete).
+### response example
+```json
+{
+  "deleted": 2, 
+  "remaining_succulents": 1, 
+  "success": true
+}
+```
+
+## POST '/succulents'
+- Create new succulent
+- Auth: collaborator at least
+- Request Arguments: `name`: string, `life_time`: number, `family_id`: integer.
+- Returns: An object that contains: `status_code`, `success`, `total_succulents`, `created` (id of new succulent).
+### request body example
+```json
+{
+  "name": "succulent 2",
+  "life_time": "2",
+  "family_id": 1
+}
+```
+### response example
+```json
+{
+  "created": 2, 
+  "status_code": 200, 
+  "success": true, 
+  "total_succulents": 2
+}
+```
+
+## PATCH '/succulents/<int:id>'
+- Update a succulent by id
+- Auth: collaborator at least
+- Request Arguments: `id`: integer,`family_id`: integer, `life_time`: number, `name`: string.
+- Returns: An object that contains: `status_code`, `success`, `updated`.
+### request body example
+```json
+{
+  "family_id": 1,
+  "id": 1,
+  "life_time": "7",
+  "name": "test succulent 1 updated"
+}
+```
+### response example
+```json
+{
+  "status_code": 200, 
+  "success": true, 
+  "updated": {
+    "family_id": 1, 
+    "id": 1, 
+    "life_time": 7, 
+    "name": "test succulent 1 updated"
+  }
+}
+```

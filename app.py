@@ -154,7 +154,7 @@ def create_app():
         })
 
     @app.route('/families/<int:id>/succulents')
-    def get_succulents_bt_family(id):
+    def get_succulents_by_family(id):
         family = Family.query.filter(Family.id == id).one_or_none()
 
         if not family:
