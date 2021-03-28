@@ -393,6 +393,13 @@ class SucculentsApiTests(unittest.TestCase):
         self.assertTrue(data["total_succulents"], 6)
         self.assertEqual(data["created"], 6)
 
+    """
+    Default route
+    """
+    def test_default_route_should_return_redirect(self):
+        response = self.client().get("/")
+        self.assertEqual(response.status_code, 302)
+
 
 if __name__ == "__main__":
     unittest.main()

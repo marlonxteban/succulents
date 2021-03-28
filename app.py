@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, redirect
 from database.model import setup_db, Family, Succulent
 from errors.processError import ProcessError
 from flask_cors import CORS
@@ -284,6 +284,13 @@ def create_app():
             "success": True,
             "updated": succulent.format()
         })
+
+    '''
+    Default route
+    '''
+    @app.route('/')
+    def get_default():
+        return redirect("/families")
 
     '''
     Error handlers.
