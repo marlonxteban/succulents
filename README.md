@@ -27,7 +27,7 @@ Install the packages using pip and the file `requirements.txt`.
 ``` bash
 pip install -r requirements.txt
 ```
-## Api Setup
+## Local Server
 1. Install python dependencies.
 2. In folder `config` create a file named `.env` and populate with the next following code:
 ``` bash
@@ -53,6 +53,47 @@ Now the API is up.
 5. The front end for this API is in the repo [succulentsclient](https://github.com/marlonxteban/succulentsclient), the instructions of how to set up the front end are in te readme of the repo.
 
 6. This API is live in [mysucculents](https://mysucculents.herokuapp.com/), the front end to use the API is live in [succulentsclient](https://succulentsclient.herokuapp.com/).
+
+## Host in heroku
+In this step it is assumed that you have at least one free subscription to heroku 
+Run the following commands from a bash terminal (It could be git bash terminar for windows users)
+
+1. Login in heroku
+``` bash
+heroku login -i
+```
+You should be requested to enter user and password.
+
+2. Create app in heroku
+For this API was run the following command
+``` bash
+heroku create mysucculents
+```
+When you create the app, the repository url should be prompted to you, you need the repo url for the next step.
+
+3. Add repo to heroku
+For this app the next command was run.
+``` bash
+git remote add succulentsheroku https://git.heroku.com/mysucculents.git
+```
+
+4. Add postgress addon to the app
+``` bash
+heroku addons:create heroku-postgresql:hobby-dev --app mysucculents
+```
+
+5. Push code to heroku repo
+``` bash
+git push succulentsheroku main
+```
+This command should deploy the app in heroku.
+
+6. Run migrations
+``` bash
+heroku run python manage.py db upgrade --app mysucculents
+```
+
+Now the API is hosted in heroku. When make changes in code just push the code to heroku (step 5) and the deployment will be run automatically.
 
 # Endpoints
 
