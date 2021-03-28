@@ -2,6 +2,11 @@
 application that shows you succulents, their characteristics and where to get them.
 Note: Actually this app is a prototype developed for the capstone project of Full Stack Web Developer nanodegree by Udacity.
 
+## motivation
+This project is carried out as the first step towards the implementation of an application that allows to see, manage and finally sell plants (succulents).
+
+# Dependencies
+
 ## Database Setup
 This project uses a postgres database engine.
 In the root folder there is a file named `succulents.psql`.
@@ -16,11 +21,14 @@ succulents_test
 ```
 for the unit tests.
 
-## Api Setup
-1. Install the packages.
+## install Python dependencies
+
+Install the packages using pip and the file `requirements.txt`.
 ``` bash
 pip install -r requirements.txt
 ```
+## Api Setup
+1. Install python dependencies.
 2. In folder `config` create a file named `.env` and populate with the next following code:
 ``` bash
 DATABASE_URL = 'postgresql://postgres:admin@localhost:5432/succulents'
@@ -36,7 +44,7 @@ python tests.py
 ```
 All tests should run ok. This test file have several tests for each endpoint an RBAC tests. there are no tests in a postman collection because the access control is tested using unit tests.
 
-4. Run
+4. Run development server
 ``` bash
 python app.py
 ```
