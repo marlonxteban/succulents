@@ -41,6 +41,19 @@ def create_app():
             "families": [family.format() for family in families]
         })
 
+    @app.route('/families/<int:id>')
+    def get_family(id):
+        family = Family.query.filter(Family.id == id).one_or_none()
+
+        if not family:
+            abort(404)
+
+        return jsonify({
+            "status_code": 200,
+            "success": True,
+            "family": family.format()
+        })
+
     @app.route('/families/<int:id>', methods=["DELETE"])
     @requires_auth('delete:family')
     def delete_family(payload, id):
@@ -93,7 +106,10 @@ def create_app():
                                 environment=environment,
                                 weather=weather,
                                 diferentiator=differentiator)
-            new_family.id = last_family.id + 1
+
+            if last_family is not None:
+                new_family.id = last_family.id + 1
+
             new_family.insert()
             total_families = Family.query.count()
 
@@ -225,7 +241,10 @@ def create_app():
             new_succulent = Succulent(name=name,
                                       family_id=family_id,
                                       life_time=life_time)
-            new_succulent.id = last_succulent.id + 1
+
+            if last_succulent is not None:
+                new_succulent.id = last_succulent.id + 1
+
             new_succulent.insert()
             total_succulents = Succulent.query.count()
 

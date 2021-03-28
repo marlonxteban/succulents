@@ -88,6 +88,22 @@ class SucculentsApiTests(unittest.TestCase):
                         "burrito1" in data["families"])
         # print(list(data["families"]))
 
+    def test_get_succulent_family(self):
+        expected_name = "burro's taik"
+        response = self.client().get("/families/2")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+        self.assertEqual(data["family"]["name"], expected_name)
+
+    def test_404_not_existing_family_detail(self):
+        error_message = "resource not found"
+        response = self.client().get("/families/3000")
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(data["success"])
+        self.assertEqual(error_message, data["message"])
+
     def test_422_delete_family_with_succulents(self):
         header = self.get_bearer_header(self.owner_token)
         error_message = "There are succulents asociated with the family."
